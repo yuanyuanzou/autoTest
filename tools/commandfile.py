@@ -56,10 +56,10 @@ def shell_command_ext(cmd="", timeout=None, boutput=False,  stdout_file=None,  s
        boutput: specify whether print output during the command running
     """
     if stdout_file is None:
-        stdout_file = os.path.expanduser("~") + os.sep + "shell_stdout"
+        stdout_file = sys.path[0]+ os.sep + "shell_stdout"
 
     if stderr_file is None:
-        stderr_file = os.path.expanduser("~") + os.sep + "shell_stderr"
+        stderr_file = sys.path[0]+ os.sep + "shell_stderr"
 
     exit_code = None
     wbuffile1 = file(stdout_file, "w")

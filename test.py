@@ -23,6 +23,7 @@ import sys
 import time
 import subprocess
 import string
+import json
 
 APK_INSTALL = "adb -s %s install %s"
 LAUNCH_TEST = "adb -s %s  shell am  instrument  -w  -r  %s/android.support.test.runner.AndroidJUnitRunner"
@@ -45,35 +46,52 @@ def _testreport():
     readlog = False
     for line in tmp_report.readlines():
         line = line.strip()        
+        # if readlog:
+        #     if "INSTRUMENTATION_STATUS:" in line or "Time:" in line:
+        #         readlog =False
+        #         continue
+        #     else:
+        #         temp_result["log"] = temp_result["log"] +line
+        # else: 
+        if "INSTRUMENTATION_STATUS_CODE:" in line :
+            if "0" in line:
+                temp_result["status"] = "pass"      
+                continue  
+            if "-2" in line or "-1" in line:
+                temp_result["status"] = "failed"
+                continue
+        if "class=" in line:
+             temp_result["class"] = line[line.find("class")+6:]
+             continue
+        if " test=" in line:
+            temp_result["testcase"] = line[line.find("test=")+5:]
+            continue
+        if "stream=" in line:
+            temp_result["log"] = ""
+            readlog = True
+            continue
         if readlog:
             if "INSTRUMENTATION_STATUS:" in line or "Time:" in line:
                 readlog =False
+                continue
             else:
                 temp_result["log"] = temp_result["log"] +line
-        else:          
-            if "INSTRUMENTATION_STATUS_CODE:" in line :
-                if "0" in line:
-                    temp_result["status"] = "success"      
-                    continue  
-                if "-2" in line or "-1" in line:
-                    temp_result["status"] = "failed"
-                    continue
-            if "class" in line:
-                 temp_result["class"] = line[line.find("class")+6:]
-                 continue
-            if " test=" in line:
-                temp_result["testcase"] = line[line.find("test=")+5:]
-                continue
-            if "stream=" in line:
-                temp_result["log"] = "log:"
-                readlog = True
                 continue
 
-        if len(temp_result) >=3 :
+        if len(temp_result) ==4 :
             result.append(temp_result)
             temp_result = {}
-        continue
+            continue
     print result
+    resultfile =sys.path[0]+ os.sep + "result" + os.sep + "result"
+    file = open(resultfile,"w")  
+    file.write(json.dumps(result))  
+    file.close()
+
+def result_show():
+    import webbrowser
+    webbrowser.open_new_tab("result" + os.sep +"index.html") 
 
 if __name__ == '__main__':
-    _testreport()
+   _testreport()
+   result_show()

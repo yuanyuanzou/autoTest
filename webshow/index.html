@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang=en>
+
+<meta charset=UTF-8>
+<script type="text/javascript" src="jquery-1.11.3.min.js"></script> 
+<style type="text/css">
+.container {
+    max-width: 800px;
+    min-width: 350px;
+}
+.PASS {
+    color:  #48cfad;
+}
+
+.FAIL {
+    color:  #ed5565;
+}
+#output {
+    padding-top: 70px;
+}
+</style>
+<script type="text/javascript">
+$(function(){
+  $.getJSON("result",function(data){
+    var $jsontip = $(".result_detail");
+    var strHtml = "";
+    var Total = eval(data).length;
+    var pass_num = 0;
+    var failed_num = 0;
+    $jsontip.empty();
+    $.each(data,function(infoIndex,info){
+      test_statue = info["status"]
+      if (info["status"] == "pass"){
+        pass_num +=1;
+        status_color = "PASS";
+      }else {
+        failed_num += 1;
+        status_color = "FAIL"
+      }
+      strHtml += "<tr class ="+status_color+" ><td>"+info["class"]+"</td>";
+      strHtml += "<td>"+info["testcase"]+"</td>";
+      strHtml += "<td>"+info["status"]+"</td>";
+      strHtml += "<td>"+info["log"]+"</td>";
+      strHtml += "</tr>"
+    })
+    $jsontip.html(strHtml);
+    $("td.SUM").html(Total);
+    $("td.PASS").html(pass_num);
+    $("td.FAIL").html(failed_num);
+  })
+})
+</script> 
+
+<title>test result</title>
+<link rel='stylesheet' href='css/bootstrap.min.css'>
+<link rel='stylesheet' href='css/bootstrap-theme.min.css'>
+<header class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#"></a>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+ <div id="output">
+    <div class="summary clearfix">
+      <table class='table'>
+        <thead>
+          <tr>
+            <th>Total</th>
+            <th>Passed</th>
+            <th>Failed</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class='SUM'>0
+            <td class='PASS'>0
+            <td class='FAIL'>0
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+      <hr>
+      <h4>Details</h4>
+      <div style='overflow-x: scroll;'>
+        <table class='table'>
+          <thead>
+            <tr>
+              <th>Test package</th>
+              <th>Test case</th>
+              <th>Status</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody class="result_detail"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
